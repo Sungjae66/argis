@@ -1,0 +1,39 @@
+@font-face {
+  font-family: 'zcbf';  /* project id 1865337 */
+  src: url('//at.alicdn.com/t/font_1865337_gkgynythi8i.eot');
+  src: url('//at.alicdn.com/t/font_1865337_gkgynythi8i.eot?#iefix') format('embedded-opentype'),
+  url('//at.alicdn.com/t/font_1865337_gkgynythi8i.woff2') format('woff2'),
+  url('//at.alicdn.com/t/font_1865337_gkgynythi8i.woff') format('woff'),
+  url('//at.alicdn.com/t/font_1865337_gkgynythi8i.ttf') format('truetype'),
+  url('//at.alicdn.com/t/font_1865337_gkgynythi8i.svg#iconfont') format('svg');
+}
+
+.zcbf {
+  font-family: "zcbf" !important;
+  font-size: 16px;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.zcbf-zichan:before {
+  content: "\e937";
+}
+
+.zcbf-arrow_leftTop:before {
+  content: "\eb8e";
+}
+
+.zcbf-mima:before {
+  content: "\e654";
+}
+
+.zcbf-ziyuan:before {
+  content: "\e60a";
+}
+
+
+/*覆盖van原样式*/
+.van-icon {
+  font-family: "vant-icon", "zcbf-zichan", "zcbf-arrow_leftTop", "zcbf-mima", "zcbf-ziyuan";
+}

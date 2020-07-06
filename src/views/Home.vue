@@ -1,7 +1,5 @@
 <template>
-  <div class="home">
-
-  </div>
+  <div class="home"></div>
 </template>
 
 <script>
@@ -22,7 +20,7 @@
         return store.state.option
       }
     },
-    mounted() {
+    created() {
       this.createMap();
     },
     methods: {
@@ -74,36 +72,120 @@
             });
             view.ui.add(basemapToggle, "top-right");
 
-            //添加图层到底图
+            //添加Trailheads要素图层
+            //定义一个simple渲染器和设置符号属性绘制一个徒步旅行者图
+            var trailheadsRenderer = {
+              type: "simple",
+              symbol: {
+                type: "picture-marker",
+                url: "http://static.arcgis.com/images/Symbols/NPS/npsPictograph_0231b.png",
+                width: "18px",
+                height: "18px"
+              }
+            };
+            // 添加路径名称标签
+            var trailheadsLabels = {
+              symbol: {
+                type: "text",
+                color: "#FFFFFF",
+                haloColor: "#5E8D74",
+                haloSize: "2px",
+                font: {
+                  size: "12px",
+                  family: "Noto Sans",
+                  style: "italic",
+                  weight: "normal"
+                }
+              },
+              labelPlacement: "above-center",
+              labelExpressionInfo: {
+                expression: "$feature.TRL_NAME"
+              }
+            };
             var trailheadsLayer = new FeatureLayer({
-              url: "https://services3.arcgis.com/GVgbJbqm8hXASVYi/arcgis/rest/services/Trailheads/FeatureServer/0"
+              url: "https://services3.arcgis.com/GVgbJbqm8hXASVYi/arcgis/rest/services/Trailheads/FeatureServer/0",
+              renderer: trailheadsRenderer,
+              labelingInfo: [trailheadsLabels]
             });
 
             map.add(trailheadsLayer);
-            // Trails feature layer (lines)
+            //定义不同的符号要素样式
+            var trailsRenderer = {
+              type: "simple",
+              symbol: {
+                color: "#BA55D3",
+                type: "simple-line",
+                style: "solid"
+              },
+              visualVariables: [
+                {
+                  type: "size",
+                  field: "ELEV_GAIN",
+                  minDataValue: 0,
+                  maxDataValue: 2300,
+                  minSize: "3px",
+                  maxSize: "7px"
+                }
+              ]
+            };
+            // 添加步道和公园以及开放空间要素图层
             var trailsLayer = new FeatureLayer({
-              url: "https://services3.arcgis.com/GVgbJbqm8hXASVYi/arcgis/rest/services/Trails/FeatureServer/0"
+              url: "https://services3.arcgis.com/GVgbJbqm8hXASVYi/arcgis/rest/services/Trails/FeatureServer/0",
+              renderer: trailsRenderer,
+              opacity: .75
             });
-
             map.add(trailsLayer, 0);
 
-            // Parks and open spaces (polygons)
-            var parksLayer = new FeatureLayer({
-              url: "https://services3.arcgis.com/GVgbJbqm8hXASVYi/arcgis/rest/services/Parks_and_Open_Space/FeatureServer/0"
+            // 设置小径图层的样式以显示仅自行车的小径
+            var bikeTrailsRenderer = {
+              type: "simple",
+              symbol: {
+                type: "simple-line",
+                style: "short-dot",
+                color: "#FF91FF",
+                width: "1px"
+              }
+            };
+            var bikeTrails = new FeatureLayer({
+              url:
+                "https://services3.arcgis.com/GVgbJbqm8hXASVYi/arcgis/rest/services/Trails/FeatureServer/0",
+              renderer: bikeTrailsRenderer,
+              definitionExpression: "USE_BIKE = 'YES'"
             });
+            map.add(bikeTrails, 1);
 
-            map.add(parksLayer, 0);
-            //使用小部件选择底图
-            // var basemapGallery = new BasemapGallery({
-            //   view: view,
-            //   source: {
-            //     portal: {
-            //       url: "https://www.arcgis.com",
-            //       useVectorBasemaps: true  // Load vector tile basemaps
-            //     }
-            //   }
-            // });
-            // view.ui.add(basemapGallery, "top-right");
+            //风格独特的公园区
+            function createFillSymbol(value, color) {
+              return {
+                "value": value,
+                "symbol": {
+                  "color": color,
+                  "type": "simple-fill",
+                  "style": "solid",
+                  "outline": {
+                    "style": "none"
+                  }
+                },
+                "label": value
+              };
+            }
+            var openSpacesRenderer = {
+              type: "unique-value",
+              field: "TYPE",
+              uniqueValueInfos: [
+                createFillSymbol("Natural Areas", "#9E559C"),
+                createFillSymbol("Regional Open Space", "#A7C636"),
+                createFillSymbol("Local Park", "#149ECE"),
+                createFillSymbol("Regional Recreation Park", "#ED5151")
+              ]
+            };
+            // 创建一个图层并将其添加到地图中
+            var openspaces = new FeatureLayer({
+              url: "https://services3.arcgis.com/GVgbJbqm8hXASVYi/arcgis/rest/services/Parks_and_Open_Space/FeatureServer/0",
+              renderer: openSpacesRenderer,
+              opacity: 0.5
+            });
+            map.add(openspaces,0);
           }).catch((err) => {
           _self.$message('地图创建失败，' + err);
         });
@@ -111,3 +193,10 @@
     }
   }
 </script>
+
+<style lang="less">
+  .home{
+    width: 100%;
+    height: 100%;
+  }
+</style>
