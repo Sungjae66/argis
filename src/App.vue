@@ -1,15 +1,35 @@
 <template>
   <div id="app">
-    <div id="nav">
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
-    </div>
-    <router-view/>
+    <router-view></router-view>
   </div>
 </template>
 
+<script>
+  export default {
+    name: 'app',
+    data(){
+      return{
+
+      }
+    },
+    mounted(){
+
+    },
+    methods: {
+
+    }
+  }
+
+</script>
 <style lang="less">
+  html, body, #app {
+    padding: 0;
+    margin: 0;
+    height: 100%;
+    width: 100%;
+  }
 #app {
+  position: absolute;   /**使这个div的大小撑满整个屏幕 */
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
