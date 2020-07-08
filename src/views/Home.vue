@@ -102,13 +102,23 @@
                 expression: "$feature.TRL_NAME"
               }
             };
+
+            //使用HTML为Trailheads图层定义弹出窗口
+            // 定义一个足迹的弹窗口
+            var popupTrailheads = {
+              "title": "Trailhead",
+              "content": "<b>Trail:</b> {TRL_NAME}<br><b>City:</b> {CITY_JUR}<br><b>Cross Street:</b> {X_STREET}<br><b>Parking:</b> {PARKING}<br><b>Elevation:</b> {ELEV_FT} ft"
+            };
             var trailheadsLayer = new FeatureLayer({
               url: "https://services3.arcgis.com/GVgbJbqm8hXASVYi/arcgis/rest/services/Trailheads/FeatureServer/0",
               renderer: trailheadsRenderer,
-              labelingInfo: [trailheadsLabels]
+              labelingInfo: [trailheadsLabels],
+              outFields: ["TRL_NAME","CITY_JUR","X_STREET","PARKING","ELEV_FT"],
+              popupTemplate: popupTrailheads
             });
 
             map.add(trailheadsLayer);
+
             //定义不同的符号要素样式
             var trailsRenderer = {
               type: "simple",
@@ -128,13 +138,90 @@
                 }
               ]
             };
+
+            // 为步道定义一个弹窗口
+            var popupTrails = {
+              title: "Trail Information",
+              // content: function(){
+              //   return "This is {TRL_NAME} with {ELEV_GAIN} ft of climbing.";
+              // }
+              content: [{
+                type: "media",
+                mediaInfos: [{
+                  type: "column-chart",
+                  caption: "",
+                  value: {
+                    fields: [ "ELEV_MIN","ELEV_MAX" ],
+                    normalizeField: null,
+                    tooltipField: "Min and max elevation values"
+                  }
+                }]
+              }]
+            };
             // 添加步道和公园以及开放空间要素图层
             var trailsLayer = new FeatureLayer({
               url: "https://services3.arcgis.com/GVgbJbqm8hXASVYi/arcgis/rest/services/Trails/FeatureServer/0",
               renderer: trailsRenderer,
-              opacity: .75
+              opacity: .75,
+              outFields: ["TRL_NAME","ELEV_GAIN"],
+              popupTemplate: popupTrails
             });
             map.add(trailsLayer, 0);
+
+            // 为公园以及开放空间定义一个弹窗口
+            var popupOpenspaces = {
+              "title": "{PARK_NAME}",
+              "content": [{
+                "type": "fields",
+                "fieldInfos": [
+                  {
+                    "fieldName": "AGNCY_NAME",
+                    "label": "Agency",
+                    "isEditable": true,
+                    "tooltip": "",
+                    "visible": true,
+                    "format": null,
+                    "stringFieldOption": "text-box"
+                  },
+                  {
+                    "fieldName": "TYPE",
+                    "label": "Type",
+                    "isEditable": true,
+                    "tooltip": "",
+                    "visible": true,
+                    "format": null,
+                    "stringFieldOption": "text-box"
+                  },
+                  {
+                    "fieldName": "ACCESS_TYP",
+                    "label": "Access",
+                    "isEditable": true,
+                    "tooltip": "",
+                    "visible": true,
+                    "format": null,
+                    "stringFieldOption": "text-box"
+                  },
+                  {
+                    "fieldName": "GIS_ACRES",
+                    "label": "Acres",
+                    "isEditable": true,
+                    "tooltip": "",
+                    "visible": true,
+                    "format": {
+                      "places": 2,
+                      "digitSeparator": true
+                    },
+                    "stringFieldOption": "text-box"
+                  }
+                ]
+              }]
+            };
+            var openspaces = new FeatureLayer({
+              url: "https://services3.arcgis.com/GVgbJbqm8hXASVYi/arcgis/rest/services/Parks_and_Open_Space_Styled/FeatureServer/0",
+              outFields: ["TYPE","PARK_NAME", "AGNCY_NAME","ACCESS_TYP","GIS_ACRES","TRLS_MI","TOTAL_GOOD","TOTAL_FAIR", "TOTAL_POOR"],
+              popupTemplate: popupOpenspaces
+            });
+            map.add(openspaces,0);
 
             // 设置小径图层的样式以显示仅自行车的小径
             var bikeTrailsRenderer = {
@@ -186,6 +273,7 @@
               opacity: 0.5
             });
             map.add(openspaces,0);
+
           }).catch((err) => {
           _self.$message('地图创建失败，' + err);
         });

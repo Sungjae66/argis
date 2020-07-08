@@ -46,7 +46,7 @@
         if(this.username != '' || this.password != ''){
           setTimeout(()=>{
             this.login();
-          },3000);
+          },2000);
         }else{
           console.log('dasda')
         }
@@ -54,7 +54,7 @@
 
       //登录
       login(){
-        localStorage.setItem('username',this.username);
+        localStorage.setItem('token',this.username);
         if (localStorage.getItem('redirect')) { //如果存在参数
           let redirect = localStorage.getItem('redirect');
           this.$router.push(redirect);//则跳转至进入登录页前的路由
